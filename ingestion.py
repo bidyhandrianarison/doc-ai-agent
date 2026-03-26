@@ -2,8 +2,9 @@ import io
 import zipfile
 import requests
 import frontmatter
+import json
 
-def read_repo_data(repo_owner, repo_name):
+def read_repo_data(repo_owner, repo_name, branch):
     """
     Download and parse all markdown files from a GitHub repository.
     
@@ -15,7 +16,7 @@ def read_repo_data(repo_owner, repo_name):
         List of dictionaries containing file content and metadata
     """
     prefix = 'https://codeload.github.com' 
-    url = f'{prefix}/{repo_owner}/{repo_name}/zip/refs/heads/main'
+    url = f'{prefix}/{repo_owner}/{repo_name}/zip/refs/heads/{branch}'
     resp = requests.get(url)
     
     if resp.status_code != 200:
@@ -45,6 +46,10 @@ def read_repo_data(repo_owner, repo_name):
     
     zf.close()
     return repository_data
-    
-dtc_faq = read_repo_data('DataTalksClub', 'faq')
-evidently_docs = read_repo_data('evidentlyai', 'docs')
+
+
+if __name__ == '__main__':
+    langchain_repo = read_repo_data('langchain-ai', 'langchain','master')
+    print(f"Langchain documents: {len(langchain_repo)}")
+    with open('data/raw_docs.json', 'w') as f:
+        json.dump(langchain_repo, f, indent=2, ensure_ascii=False)
